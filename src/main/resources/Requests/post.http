@@ -1,0 +1,28 @@
+### Post
+POST localhost:8080/api/post/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwic3ViIjoiemF4cmlkZGlub3YxNzA3QGdtYWlsLmNvbSIsImlhdCI6MTczNTEzOTIwMiwiZXhwIjoxNzM1MjI1NjAyfQ.hecPuSxhNHeB0xbFXsVxLLMqqbdGFL1jcAh8sbqLxew
+
+{
+  "photoId": "79232f23-a1b0-4575-9523-4576accffd60.png",
+  "content": "Assalomu alaykum"
+}
+
+### GET
+GET localhost:8080/api/post/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwic3ViIjoiemF4cmlkZGlub3YxNzA3QGdtYWlsLmNvbSIsImlhdCI6MTczNTEzOTIwMiwiZXhwIjoxNzM1MjI1NjAyfQ.hecPuSxhNHeB0xbFXsVxLLMqqbdGFL1jcAh8sbqLxew
+
+### Filter
+POST localhost:8080/api/post/filter?page=1&size=10
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwic3ViIjoiemF4cmlkZGlub3YxNzA3QGdtYWlsLmNvbSIsImlhdCI6MTczNTEzOTIwMiwiZXhwIjoxNzM1MjI1NjAyfQ.hecPuSxhNHeB0xbFXsVxLLMqqbdGFL1jcAh8sbqLxew
+
+{
+  "name": "Mexriddin"
+}
+
+
+###
+GET localhost:8080/api/post/all?page=1&size=10
+
+
