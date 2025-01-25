@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private Integer id;
     private GetAttachDTO photo;
+    private String title;
     private String content;
     private LocalDateTime createdDate;
 }

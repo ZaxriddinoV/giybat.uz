@@ -19,6 +19,7 @@ public class PostEntity {
     private String photoId;
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+    @Column(name = "title")
     private String title;
     @Column(name = "created_date")
     private LocalDateTime createdDate;

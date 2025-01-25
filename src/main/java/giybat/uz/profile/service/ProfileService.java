@@ -1,7 +1,12 @@
 package giybat.uz.profile.service;
 
 
+import giybat.uz.attach.service.AttachService;
 import giybat.uz.exceptionHandler.AppBadException;
+import giybat.uz.profile.dto.JwtDTO;
+import giybat.uz.profile.dto.ProfileInfoDTO;
+import giybat.uz.profile.enums.ProfileRole;
+import giybat.uz.securityConfig.config.CustomUserDetails;
 import giybat.uz.usernameHistory.repository.SmsHistoryRepository;
 import giybat.uz.usernameHistory.service.SmsHistoryService;
 import giybat.uz.usernameHistory.service.SmsService;
@@ -9,12 +14,15 @@ import giybat.uz.profile.dto.ProfileDTO;
 import giybat.uz.profile.dto.UpdateProfileDetailDTO;
 import giybat.uz.profile.entity.ProfileEntity;
 import giybat.uz.profile.repository.ProfileRepository;
+import giybat.uz.util.ApiResponse;
+import giybat.uz.util.JwtUtil;
 import giybat.uz.util.SpringSecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -32,6 +40,8 @@ public class ProfileService {
     SmsHistoryService historyService;
     @Autowired
     SmsHistoryRepository smsHistoryRepository;
+    @Autowired
+    AttachService attachService;
 
     public ProfileDTO createProfile(ProfileDTO profile) {
         boolean b = profileRepository.existsByUsername(profile.getUsername());
@@ -84,11 +94,25 @@ public class ProfileService {
         }
         return result;
     }
-    public ProfileEntity getByUsername(String username) {
-        Optional<ProfileEntity> byUsernameAndVisibleTrue = profileRepository.findByUsernameAndVisibleTrue(username);
+    public ProfileInfoDTO getByUsername() {
+        CustomUserDetails currentUser = SpringSecurityUtil.getCurrentUser();
+        if (currentUser == null || !currentUser.getRole().equals(ProfileRole.ROLE_USER)) {
+            throw new AppBadException("Invalid token");
+        }
+        if (currentUser.getUsername() == null || currentUser.getUsername().isEmpty() || currentUser.getId() == null) {
+            throw new AppBadException("Invalid username");
+        }
+        Optional<ProfileEntity> byUsernameAndVisibleTrue = profileRepository.findById(currentUser.getId());
         if (byUsernameAndVisibleTrue.isPresent()){
-            return byUsernameAndVisibleTrue.get();
-        }else return null;
+            ProfileEntity profileEntity = byUsernameAndVisibleTrue.get();
+            ProfileInfoDTO profileDTO = new ProfileInfoDTO();
+            profileDTO.setId(profileEntity.getId());
+            profileDTO.setUsername(profileEntity.getUsername());
+            profileDTO.setSurname(profileEntity.getSurname());
+            profileDTO.setName(profileEntity.getName());
+            profileDTO.setPhoto(attachService.getUrl(profileEntity.getPhotoId()));
+            return profileDTO;
+        }else throw new AppBadException("Bunday foydalanuchi topilmadi");
     }
 
     public Integer deleted(Integer id) {

@@ -66,6 +66,7 @@ public class PostService {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(postEntity.getId());
         postDTO.setCreatedDate(postEntity.getCreatedDate());
+        postDTO.setTitle(postEntity.getTitle());
         postDTO.setContent(postEntity.getContent());
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
         return postDTO;
@@ -108,7 +109,7 @@ public class PostService {
             dtoList.add(toDTOInfo(entity));
         }
         PageImpl page1 = new PageImpl<>(dtoList, pageRequest, total);
-        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber(),page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
+        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber() + 1,page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
         return pageImplUtil;
     }
 
@@ -116,6 +117,7 @@ public class PostService {
         PostInfoDTO postDTO = new PostInfoDTO();
         postDTO.setId(postEntity.getId());
         postDTO.setCreatedDate(postEntity.getCreatedDate());
+        postDTO.setTitle(postEntity.getTitle());
         postDTO.setContent(postEntity.getContent());
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
         postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getName(),postEntity.getUser().getPhotoId()));
