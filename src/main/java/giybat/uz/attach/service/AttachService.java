@@ -8,6 +8,7 @@ import giybat.uz.attach.repository.AttachRepository;
 import giybat.uz.exceptionHandler.AppBadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ import java.util.*;
 public class AttachService {
 
     private final String folderName = "attaches";
-    private final String url = "/api/attach/download/";
+    private final String url = "/api/attach/";
     @Value("${server.domain}")
     private String domainName;
     @Autowired
@@ -96,14 +97,18 @@ public class AttachService {
         Path filePath = Paths.get(path).normalize();
         Resource resource = null;
         try {
-            resource = new UrlResource(filePath.toUri());
+            // FileSystemResource bilan to'g'ri resursni oling
+            resource = new FileSystemResource(filePath);
+
             if (!resource.exists()) {
                 throw new RuntimeException("File not found: " + path);
             }
+
             String contentType = Files.probeContentType(filePath);
             if (contentType == null) {
-                contentType = "application/octet-stream";
+                contentType = "application/octet-stream"; // Default content type
             }
+
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(resource);
@@ -111,6 +116,7 @@ public class AttachService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
     public AttachEntity getEntity(String id) {
         Optional<AttachEntity> optional = attachRepository.findById(id);
@@ -134,10 +140,13 @@ public class AttachService {
         return page1;
     }
     public GetAttachDTO getUrl(String id) {
+        if (id == null || id.isEmpty()){
+            return new GetAttachDTO();
+        }
         AttachEntity entity = getEntity(id);
         GetAttachDTO dto = new GetAttachDTO();
         dto.setId(entity.getId());
-        dto.setUrl(domainName + "/open/name/" + entity.getId());
+        dto.setUrl(domainName + "/api/attach/open/name/" + entity.getId());
         return dto;
     }
 

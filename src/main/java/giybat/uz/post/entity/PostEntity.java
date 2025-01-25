@@ -17,8 +17,10 @@ public class PostEntity {
     private Integer id;
     @Column(name = "photo_id")
     private String photoId;
-    @Column(name = "content",columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+    @Column(name = "title")
+    private String title;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
     @Column(name = "visible")

@@ -57,6 +57,12 @@ public class ProfileController {
         }
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> getByUsername() {
+        ApiResponse<?> response = new ApiResponse<>(200,"success",service.getByUsername());
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "DELETE", description = "ADMIN -  user deleted")

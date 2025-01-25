@@ -1,7 +1,6 @@
 package giybat.uz.post.dto;
 
 import giybat.uz.attach.dto.GetAttachDTO;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 public class PostDTO {
     private Integer id;
-    private GetAttachDTO attachDTO;
+    private GetAttachDTO photo;
+    private String title;
     private String content;
     private LocalDateTime createdDate;
 }

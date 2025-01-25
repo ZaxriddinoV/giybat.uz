@@ -15,6 +15,6 @@ public interface PostRepository extends JpaRepository<PostEntity,Integer>, Pagin
 
     Optional<PostEntity> findByIdAndVisibleTrue(Integer id);
 
-    @Query("FROM PostEntity AS p")
+    @Query("FROM PostEntity  p")
     Page<PostEntity> getAll(PageRequest pageRequest);
 }

@@ -13,6 +13,7 @@ public class PostInfoDTO {
     private Integer id;
     private GetAttachDTO photo;
     private ProfileShortInfo user;
+    private String title;
     private String content;
     private LocalDateTime createdDate;
 }
