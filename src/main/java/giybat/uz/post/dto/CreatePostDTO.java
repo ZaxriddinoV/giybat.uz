@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 public class CreatePostDTO {
     private String photoId;
+    @NotBlank(message = "title writing is a must")
+    private String title;
     @NotBlank(message = "Content writing is a must")
     private String content;
 }

@@ -51,7 +51,7 @@ public class PostController {
     }
 
     @GetMapping("/all")
-    private ResponseEntity<?> pagination(@RequestParam(value = "page", defaultValue = "1") int page,
+    public ResponseEntity<?> pagination(@RequestParam(value = "page", defaultValue = "1") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size) {
         ApiResponse<?> response = new ApiResponse<>(200,"succuess",postService.postAll(page - 1, size));
         return ResponseEntity.ok(response);

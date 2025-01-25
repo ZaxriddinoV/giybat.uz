@@ -9,6 +9,7 @@ import giybat.uz.post.repository.PostRepository;
 import giybat.uz.profile.dto.ProfileShortInfo;
 import giybat.uz.profile.enums.ProfileRole;
 import giybat.uz.profile.service.ProfileService;
+import giybat.uz.util.PageImplUtil;
 import giybat.uz.util.SpringSecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,7 @@ public class PostService {
         postEntity.setContent(dto.getContent());
         postEntity.setPhotoId(dto.getPhotoId());
         postEntity.setVisible(Boolean.TRUE);
+        postEntity.setTitle(dto.getTitle());
         postEntity.setUser(profileService.getByIdProfile(SpringSecurityUtil.getCurrentUser().getId()));
         postEntity.setCreatedDate(LocalDateTime.now());
         postRepository.save(postEntity);
@@ -65,7 +67,7 @@ public class PostService {
         postDTO.setId(postEntity.getId());
         postDTO.setCreatedDate(postEntity.getCreatedDate());
         postDTO.setContent(postEntity.getContent());
-        postDTO.setAttachDTO(attachService.getUrl(postEntity.getPhotoId()));
+        postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
         return postDTO;
     }
 
@@ -97,7 +99,7 @@ public class PostService {
         }
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
-    public Page<PostInfoDTO> postAll(int page, int size) {
+    public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostEntity> entityList = postRepository.getAll(pageRequest);
         Long total = entityList.getTotalElements();
@@ -106,8 +108,8 @@ public class PostService {
             dtoList.add(toDTOInfo(entity));
         }
         PageImpl page1 = new PageImpl<>(dtoList, pageRequest, total);
-
-        return page1;
+        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber(),page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
+        return pageImplUtil;
     }
 
     private PostInfoDTO toDTOInfo(PostEntity postEntity) {
