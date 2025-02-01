@@ -18,7 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +56,7 @@ public class PostService {
             if (byId.get().getUser().getId().equals(SpringSecurityUtil.getCurrentUser().getId())) {
                 byId.get().setContent(dto.getContent());
                 byId.get().setPhotoId(dto.getPhotoId());
+                byId.get().setTitle(dto.getTitle());
                 byId.get().setCreatedDate(LocalDateTime.now());
                 postRepository.save(byId.get());
                 return toDTO(byId.get());
@@ -101,6 +105,8 @@ public class PostService {
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
     public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
+        if (page < 0){throw new AppBadException("page must be greater than 0");}
+
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostEntity> entityList = postRepository.getAll(pageRequest);
         Long total = entityList.getTotalElements();
@@ -114,9 +120,13 @@ public class PostService {
     }
 
     private PostInfoDTO toDTOInfo(PostEntity postEntity) {
+        LocalDateTime createdDate = postEntity.getCreatedDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String formattedDate = createdDate.format(formatter);
+
         PostInfoDTO postDTO = new PostInfoDTO();
         postDTO.setId(postEntity.getId());
-        postDTO.setCreatedDate(postEntity.getCreatedDate());
+        postDTO.setCreatedDate(formattedDate);
         postDTO.setTitle(postEntity.getTitle());
         postDTO.setContent(postEntity.getContent());
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));

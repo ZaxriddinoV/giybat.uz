@@ -66,6 +66,8 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+
+
     @ExceptionHandler({AppBadException.class, IllegalArgumentException.class})
     public ResponseEntity<?> handle(AppBadException e) {
         ApiResponse<?> response = new ApiResponse<>(400,e.getMessage(),null);
