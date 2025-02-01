@@ -18,8 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -119,6 +118,21 @@ public class PostService {
         return pageImplUtil;
     }
 
+    public PageImplUtil<PostInfoDTO> myPosts(int page, int size) {
+        if (page < 0){throw new AppBadException("page must be greater than 0");}
+        Integer currentUserId = SpringSecurityUtil.getCurrentUserId();
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<PostEntity> entityList = postRepository.getPosts(pageRequest,currentUserId);
+        Long total = entityList.getTotalElements();
+        List<PostInfoDTO> dtoList = new LinkedList<>();
+        for (PostEntity entity : entityList) {
+            dtoList.add(toDTOInfo(entity));
+        }
+        PageImpl page1 = new PageImpl<>(dtoList, pageRequest, total);
+        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber() + 1,page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
+        return pageImplUtil;
+    }
+
     private PostInfoDTO toDTOInfo(PostEntity postEntity) {
         LocalDateTime createdDate = postEntity.getCreatedDate();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -133,7 +147,5 @@ public class PostService {
         postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getName(),postEntity.getUser().getPhotoId()));
         return postDTO;
     }
-
-
 
 }

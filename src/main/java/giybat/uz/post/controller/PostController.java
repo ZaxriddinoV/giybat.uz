@@ -66,6 +66,13 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/my/post")
+    public ResponseEntity<?> myPosts(@RequestParam(value = "page", defaultValue = "1") int page,
+                                        @RequestParam(value = "size", defaultValue = "10") int size) {
+        ApiResponse<?> response = new ApiResponse<>(200,"succuess",postService.myPosts(page - 1, size));
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @ExceptionHandler({AppBadException.class, IllegalArgumentException.class})
