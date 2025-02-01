@@ -5,7 +5,7 @@ import giybat.uz.profile.dto.ProfileShortInfo;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,5 +15,5 @@ public class PostInfoDTO {
     private ProfileShortInfo user;
     private String title;
     private String content;
-    private LocalDateTime createdDate;
+    private String createdDate;
 }
