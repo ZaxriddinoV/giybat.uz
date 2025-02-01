@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileShortInfo {
+    private Integer id;
     private String name;
     private String photoId;
 }

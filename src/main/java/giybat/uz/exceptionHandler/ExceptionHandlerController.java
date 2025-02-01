@@ -1,6 +1,7 @@
 package giybat.uz.exceptionHandler;
 
 
+import giybat.uz.util.ApiResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +19,17 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AppBadException.class)
     public ResponseEntity<?> handle(AppBadException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        ApiResponse<?> response = new ApiResponse<>(400,e.getMessage(),null);
+        return ResponseEntity.badRequest().body(response);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
                                                                   HttpStatusCode status, WebRequest request) {
-
-
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", new Date());
         body.put("status", status.value());
-
         List<String> errors = new LinkedList<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getDefaultMessage());
@@ -41,8 +40,9 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     }
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handle(RuntimeException e) {
+        ApiResponse<?> response = new ApiResponse<>(400,e.getMessage(),null);
         e.printStackTrace();
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.badRequest().body(response);
     }
 
 }

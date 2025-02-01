@@ -18,6 +18,6 @@ public interface PostRepository extends JpaRepository<PostEntity,Integer>, Pagin
     @Query("FROM PostEntity  p WHERE p.visible = TRUE ")
     Page<PostEntity> getAll(PageRequest pageRequest);
 
-    @Query("FROM PostEntity as p WHERE p.user.id = ?1 ")
+    @Query("FROM PostEntity as p WHERE p.user.id = ?1 AND p.visible = TRUE")
     Page<PostEntity> getPosts(PageRequest pageRequest, Integer currentUserId);
 }

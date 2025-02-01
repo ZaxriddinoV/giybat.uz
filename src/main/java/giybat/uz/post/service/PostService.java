@@ -1,5 +1,6 @@
 package giybat.uz.post.service;
 
+import giybat.uz.attach.dto.AttachDTO;
 import giybat.uz.attach.service.AttachService;
 import giybat.uz.exceptionHandler.AppBadException;
 import giybat.uz.post.dto.*;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalDateTime;
@@ -36,29 +38,44 @@ public class PostService {
     @Autowired
     private CustomRepository customRepository;
 
-    public PostDTO AddedPost(CreatePostDTO dto) {
-        PostEntity postEntity = new PostEntity();
-        postEntity.setContent(dto.getContent());
-        postEntity.setPhotoId(dto.getPhotoId());
-        postEntity.setVisible(Boolean.TRUE);
-        postEntity.setTitle(dto.getTitle());
-        postEntity.setUser(profileService.getByIdProfile(SpringSecurityUtil.getCurrentUser().getId()));
-        postEntity.setCreatedDate(LocalDateTime.now());
-        postRepository.save(postEntity);
-        return toDTO(postEntity);
+    public PostDTO AddedPost(CreatePostDTO dto, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new AppBadException("file is empty");
+        } else {
+            AttachDTO upload = attachService.upload(file);
+
+            PostEntity postEntity = new PostEntity();
+            postEntity.setContent(dto.getContent());
+            postEntity.setPhotoId(upload.getId());
+            postEntity.setVisible(Boolean.TRUE);
+            postEntity.setTitle(dto.getTitle());
+            postEntity.setUser(profileService.getByIdProfile(SpringSecurityUtil.getCurrentUser().getId()));
+            postEntity.setCreatedDate(LocalDateTime.now());
+            postRepository.save(postEntity);
+            return toDTO(postEntity);
+        }
+
     }
 
-    public PostDTO update(CreatePostDTO dto, Integer id) {
+    public PostDTO update(CreatePostDTO dto, Integer id, MultipartFile file) {
         Optional<PostEntity> byId = postRepository.findById(id);
-
         if (byId.isPresent()) {
             if (byId.get().getUser().getId().equals(SpringSecurityUtil.getCurrentUser().getId())) {
-                byId.get().setContent(dto.getContent());
-                byId.get().setPhotoId(dto.getPhotoId());
-                byId.get().setTitle(dto.getTitle());
-                byId.get().setCreatedDate(LocalDateTime.now());
-                postRepository.save(byId.get());
-                return toDTO(byId.get());
+                if (file.isEmpty()) {
+                    byId.get().setContent(dto.getContent());
+                    byId.get().setTitle(dto.getTitle());
+                    byId.get().setCreatedDate(LocalDateTime.now());
+                    postRepository.save(byId.get());
+                    return toDTO(byId.get());
+                } else {
+                    AttachDTO upload = attachService.upload(file);
+                    byId.get().setContent(dto.getContent());
+                    byId.get().setPhotoId(upload.getId());
+                    byId.get().setTitle(dto.getTitle());
+                    byId.get().setCreatedDate(LocalDateTime.now());
+                    postRepository.save(byId.get());
+                    return toDTO(byId.get());
+                }
             } else throw new AppBadException("User is not authorized to update this post");
         } else {
             throw new AppBadException("Id not found");
@@ -82,7 +99,7 @@ public class PostService {
                 byIdAndVisibleTrue.get().setVisible(Boolean.FALSE);
                 postRepository.save(byIdAndVisibleTrue.get());
                 return true;
-            }else throw new AppBadException("User is not authorized to delete this post");
+            } else throw new AppBadException("User is not authorized to delete this post");
         } else throw new AppBadException("Id not found");
     }
 
@@ -103,8 +120,11 @@ public class PostService {
         }
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
+
     public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
-        if (page < 0){throw new AppBadException("page must be greater than 0");}
+        if (page < 0) {
+            throw new AppBadException("page must be greater than 0");
+        }
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostEntity> entityList = postRepository.getAll(pageRequest);
@@ -114,22 +134,24 @@ public class PostService {
             dtoList.add(toDTOInfo(entity));
         }
         PageImpl page1 = new PageImpl<>(dtoList, pageRequest, total);
-        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber() + 1,page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
+        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList, page1.getNumber() + 1, page1.getSize(), page1.getTotalElements(), page1.getTotalPages());
         return pageImplUtil;
     }
 
     public PageImplUtil<PostInfoDTO> myPosts(int page, int size) {
-        if (page < 0){throw new AppBadException("page must be greater than 0");}
+        if (page < 0) {
+            throw new AppBadException("page must be greater than 0");
+        }
         Integer currentUserId = SpringSecurityUtil.getCurrentUserId();
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<PostEntity> entityList = postRepository.getPosts(pageRequest,currentUserId);
+        Page<PostEntity> entityList = postRepository.getPosts(pageRequest, currentUserId);
         Long total = entityList.getTotalElements();
         List<PostInfoDTO> dtoList = new LinkedList<>();
         for (PostEntity entity : entityList) {
             dtoList.add(toDTOInfo(entity));
         }
         PageImpl page1 = new PageImpl<>(dtoList, pageRequest, total);
-        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList,page1.getNumber() + 1,page1.getSize(),page1.getTotalElements(),page1.getTotalPages());
+        PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList, page1.getNumber() + 1, page1.getSize(), page1.getTotalElements(), page1.getTotalPages());
         return pageImplUtil;
     }
 
@@ -144,7 +166,7 @@ public class PostService {
         postDTO.setTitle(postEntity.getTitle());
         postDTO.setContent(postEntity.getContent());
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
-        postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getName(),postEntity.getUser().getPhotoId()));
+        postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getId(),postEntity.getUser().getName(), postEntity.getUser().getPhotoId()));
         return postDTO;
     }
 
