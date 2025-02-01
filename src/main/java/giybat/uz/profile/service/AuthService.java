@@ -145,6 +145,7 @@ public class AuthService {
             throw new AppBadException("User Not Active");
         }
         ProfileDTO profileDTO = new ProfileDTO();
+        profileDTO.setId(entity.getId());
         profileDTO.setName(entity.getName());
         profileDTO.setSurname(entity.getSurname());
         profileDTO.setUsername(entity.getUsername());

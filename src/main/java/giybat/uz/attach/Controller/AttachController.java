@@ -37,7 +37,7 @@ public class AttachController {
     }
     @ExceptionHandler({AppBadException.class, IllegalArgumentException.class})
     public ResponseEntity<?> handle(AppBadException e) {
-        ApiResponse<?> response = new ApiResponse<>(200,"error",e.getMessage());
+        ApiResponse<?> response = new ApiResponse<>(200,e.getMessage(),null);
         return ResponseEntity.badRequest().body(response);
     }
 
