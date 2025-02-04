@@ -13,6 +13,10 @@ import giybat.uz.profile.service.ProfileService;
 import giybat.uz.util.PageImplUtil;
 import giybat.uz.util.SpringSecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +42,7 @@ public class PostService {
     @Autowired
     private CustomRepository customRepository;
 
+
     public PostDTO AddedPost(CreatePostDTO dto, MultipartFile file) {
         if (file.isEmpty()) {
             throw new AppBadException("file is empty");
@@ -56,7 +61,7 @@ public class PostService {
         }
 
     }
-
+    @CachePut(value = "posts", key = "#id")
     public PostDTO update(CreatePostDTO dto, Integer id, MultipartFile file) {
         Optional<PostEntity> byId = postRepository.findById(id);
         if (byId.isPresent()) {
@@ -91,7 +96,7 @@ public class PostService {
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
         return postDTO;
     }
-
+    @CacheEvict(value = "posts",key = "#id")
     public Boolean delete(Integer id) {
         Optional<PostEntity> byIdAndVisibleTrue = postRepository.findByIdAndVisibleTrue(id);
         if (byIdAndVisibleTrue.isPresent()) {
@@ -103,7 +108,7 @@ public class PostService {
         } else throw new AppBadException("Id not found");
     }
 
-
+    @Cacheable(value = "posts", key = "#id")
     public PostInfoDTO getPostId(Integer id) {
         Optional<PostEntity> byIdAndVisibleTrue = postRepository.findByIdAndVisibleTrue(id);
         if (byIdAndVisibleTrue.isPresent()) {
@@ -121,6 +126,7 @@ public class PostService {
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
 
+    @Cacheable(value = "posts")
     public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
         if (page < 0) {
             throw new AppBadException("page must be greater than 0");
@@ -137,6 +143,7 @@ public class PostService {
         PageImplUtil<PostInfoDTO> pageImplUtil = new PageImplUtil<>(dtoList, page1.getNumber() + 1, page1.getSize(), page1.getTotalElements(), page1.getTotalPages());
         return pageImplUtil;
     }
+
 
     public PageImplUtil<PostInfoDTO> myPosts(int page, int size) {
         if (page < 0) {
@@ -166,7 +173,7 @@ public class PostService {
         postDTO.setTitle(postEntity.getTitle());
         postDTO.setContent(postEntity.getContent());
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
-        postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getId(),postEntity.getUser().getName(), postEntity.getUser().getPhotoId()));
+        postDTO.setUser(new ProfileShortInfo(postEntity.getUser().getId(), postEntity.getUser().getName(), postEntity.getUser().getPhotoId()));
         return postDTO;
     }
 
