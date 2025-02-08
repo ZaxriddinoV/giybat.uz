@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +41,7 @@ public class PostService {
     @Autowired
     private CustomRepository customRepository;
 
-
+    @CachePut(value = "posts", key = "#result.id")
     public PostDTO AddedPost(CreatePostDTO dto, MultipartFile file) {
         if (file.isEmpty()) {
             throw new AppBadException("file is empty");
@@ -61,7 +60,7 @@ public class PostService {
         }
 
     }
-    @CachePut(value = "posts", key = "#id")
+    @CachePut(value = "posts", key = "#result.id")
     public PostDTO update(CreatePostDTO dto, Integer id, MultipartFile file) {
         Optional<PostEntity> byId = postRepository.findById(id);
         if (byId.isPresent()) {
@@ -126,12 +125,11 @@ public class PostService {
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
 
-    @Cacheable(value = "posts")
+    @Cacheable(value = "posts", key = "'all_' + #page + '_' + #size")
     public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
         if (page < 0) {
             throw new AppBadException("page must be greater than 0");
         }
-
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostEntity> entityList = postRepository.getAll(pageRequest);
         Long total = entityList.getTotalElements();
