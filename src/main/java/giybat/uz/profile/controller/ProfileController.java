@@ -25,37 +25,6 @@ public class ProfileController {
     @Autowired
     private ProfileService service;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/")
-    @Operation(summary = "Admin add user", description = "Add user via ADMIN")
-    public ResponseEntity<?> addProfile(@RequestBody @Valid ProfileDTO requestDTO,
-                                        @RequestHeader("Authorization") String token) {
-
-        JwtDTO dto = JwtUtil.decode(token.substring(7));
-        if (dto.getRole().equals(ProfileRole.ROLE_ADMIN)) {
-            ApiResponse<?> response = new ApiResponse<>(201, "success", service.createProfile(requestDTO));
-            return ResponseEntity.status(201).body(response);
-        } else {
-            ApiResponse<?> response = new ApiResponse<>(403, "error", null);
-            return ResponseEntity.status(403).body(response);
-        }
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/")
-    @Operation(summary = "Users", description = "Get all users")
-    public ResponseEntity<?> getAllProfile(@RequestParam(value = "page", defaultValue = "1") int page,
-                                           @RequestParam(value = "size", defaultValue = "10") int size,
-                                           @RequestHeader("Authorization") String token) {
-        JwtDTO dto = JwtUtil.decode(token.substring(7));
-        if (dto.getRole().equals(ProfileRole.ROLE_ADMIN)) {
-            ApiResponse<?> response = new ApiResponse<>(200, "success", service.profileAll(page - 1, size));
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<?> response = new ApiResponse<>(403, "error", null);
-            return ResponseEntity.status(403).body(response);
-        }
-    }
 
     @GetMapping("/info")
     public ResponseEntity<?> getByUsername() {

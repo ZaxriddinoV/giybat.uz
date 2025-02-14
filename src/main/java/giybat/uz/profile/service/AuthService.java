@@ -1,9 +1,7 @@
 package giybat.uz.profile.service;
 
 
-import giybat.uz.attach.entity.AttachEntity;
 import giybat.uz.exceptionHandler.AppBadException;
-import giybat.uz.securityConfig.config.CustomUserDetails;
 import giybat.uz.usernameHistory.dto.SmsConfirmDTO;
 import giybat.uz.usernameHistory.entiy.SmsHistoryEntity;
 import giybat.uz.usernameHistory.repository.SmsHistoryRepository;
@@ -24,10 +22,6 @@ import giybat.uz.util.MD5Util;
 import giybat.uz.util.UsernameValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -72,7 +66,7 @@ public class AuthService {
                 sb.append("<h1 style=\"text-align: center\"> Complete Registration</h1>");
                 sb.append("<br>");
                 sb.append("<p>Click the link below to complete registration</p>\n");
-                sb.append("<p><a style=\"padding: 5px; background-color: indianred; color: white\"  href=http://localhost:8080/api/auth/registration/confirm/")
+                sb.append("<p><a style=\"padding: 5px; background-color: indianred; color: white\"  href=http://192.168.1.68:8080/api/auth/registration/confirm/")
                         .append(profileEmail.getId()).append(" target=_blank >Click Th</a></p>\n");
 
                 emailSendingService.sendSimpleMessage(dto.getUsername(), "Complite Registration", sb.toString());

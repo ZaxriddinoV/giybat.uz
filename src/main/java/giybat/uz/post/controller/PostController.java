@@ -82,6 +82,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam(value = "page", defaultValue = "1") int page,
+                                    @RequestParam(value = "size", defaultValue = "10") int size,
+                                    @RequestParam(value = "q", required = false) String q) {
+        return null;
+    }
 
     @ExceptionHandler({AppBadException.class, IllegalArgumentException.class})
     public ResponseEntity<?> handle(AppBadException e) {

@@ -41,7 +41,7 @@ public class PostService {
     @Autowired
     private CustomRepository customRepository;
 
-    @CachePut(value = "posts", key = "#result.id")
+//    @CachePut(value = "posts", key = "#result.id")
     public PostDTO AddedPost(CreatePostDTO dto, MultipartFile file) {
         if (file.isEmpty()) {
             throw new AppBadException("file is empty");
@@ -60,7 +60,7 @@ public class PostService {
         }
 
     }
-    @CachePut(value = "posts", key = "#result.id")
+//    @CachePut(value = "posts", key = "#result.id")
     public PostDTO update(CreatePostDTO dto, Integer id, MultipartFile file) {
         Optional<PostEntity> byId = postRepository.findById(id);
         if (byId.isPresent()) {
@@ -95,7 +95,7 @@ public class PostService {
         postDTO.setPhoto(attachService.getUrl(postEntity.getPhotoId()));
         return postDTO;
     }
-    @CacheEvict(value = "posts",key = "#id")
+//    @CacheEvict(value = "posts",key = "#id")
     public Boolean delete(Integer id) {
         Optional<PostEntity> byIdAndVisibleTrue = postRepository.findByIdAndVisibleTrue(id);
         if (byIdAndVisibleTrue.isPresent()) {
@@ -107,7 +107,7 @@ public class PostService {
         } else throw new AppBadException("Id not found");
     }
 
-    @Cacheable(value = "posts", key = "#id")
+//    @Cacheable(value = "posts", key = "#id")
     public PostInfoDTO getPostId(Integer id) {
         Optional<PostEntity> byIdAndVisibleTrue = postRepository.findByIdAndVisibleTrue(id);
         if (byIdAndVisibleTrue.isPresent()) {
@@ -125,7 +125,7 @@ public class PostService {
         return new PageImpl<>(dtoList, PageRequest.of(page, size), result.getTotal());
     }
 
-    @Cacheable(value = "posts", key = "'all_' + #page + '_' + #size")
+//    @Cacheable(value = "posts", key = "'all_' + #page + '_' + #size")
     public PageImplUtil<PostInfoDTO> postAll(int page, int size) {
         if (page < 0) {
             throw new AppBadException("page must be greater than 0");

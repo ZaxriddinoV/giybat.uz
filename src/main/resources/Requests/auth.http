@@ -3,9 +3,9 @@ POST localhost:8080/api/auth/registration
 Content-Type: application/json
 
 {
-  "name": "Mexriddin",
+  "name": "Sardor",
   "surname": "Zaxriddinov",
-  "username": "zaxriddinov1707@gmail.com",
+  "username": "",
   "password": "123456"
 }
 ### LOGIN
